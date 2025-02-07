@@ -23,9 +23,20 @@ def turn_left(degrees=90):
 def turn_right(degrees=90):
     fc.turn_right(degrees)
 
+def move25():
+    speed4 = fc.Speed(25)
+    speed4.start()  
+    fc.backward(100)
+    x = 0
+    while x < range(1):
+        time.sleep(0.1)
+        speed = speed4
+        x += speed * 0.1 
+        print("%smm/s"%speed)
+    print("%smm"%speed)    
+    speed4.definit()
+    fc.stop(0)
+
 if __name__ == "__main__":
-    forward()
-    stop()
-    backward()
-    stop()
+    move25()
     
