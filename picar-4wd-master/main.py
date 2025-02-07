@@ -37,6 +37,15 @@ def move25():
     speed4.definit()
     fc.stop(0)
 
+def move_autonomous():
+    while True:
+        if get_distance() < 15:
+            stop()
+            backward()
+            turn_left()
+        else:
+            forward()
+
 if __name__ == "__main__":
-    move25()
+    move_autonomous()
     
