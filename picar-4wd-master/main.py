@@ -47,5 +47,7 @@ def move_autonomous():
             forward()
 
 if __name__ == "__main__":
-    move_autonomous()
+    print ('Hello World')
+
+print('Hello World outside main')
     
