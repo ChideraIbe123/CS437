@@ -1,35 +1,32 @@
 from picarx import Picarx
 import time
 
-POWER = 50
-SafeDistance = 40   # > 40 safe
-DangerDistance = 20 # > 20 && < 40 turn around, 
-                    # < 20 backward
+SPEED = 100
+DANGER = 20
+TURN_DISTANCE = 20
 
-def main():
+def run():
     try:
-        px = Picarx()
-        # px = Picarx(ultrasonic_pins=['D2','D3']) # tring, echo
-       
+        car = Picarx()
+        
         while True:
-            distance = round(px.ultrasonic.read(), 2)
-            print("distance: ",distance)
-            if distance >= SafeDistance:
-                px.set_dir_servo_angle(0)
-                px.forward(POWER)
-            elif distance >= DangerDistance:
-                px.set_dir_servo_angle(30)
-                px.forward(POWER)
+            dist = round(car.ultrasonic.read(), 2)
+            
+            if dist >= DANGER:
+                car.set_dir_servo_angle(0)
+                car.forward(SPEED)
+            elif dist >= TURN_DISTANCE:
+                car.set_dir_servo_angle(30)
+                car.forward(SPEED)
                 time.sleep(0.1)
             else:
-                px.set_dir_servo_angle(-30)
-                px.backward(POWER)
+                car.set_dir_servo_angle(-30)
+                car.backward(SPEED)
                 time.sleep(0.5)
 
     finally:
-        px.forward(0)
+        car.forward(0)
 
 
 if __name__ == "__main__":
-    main()
-
+    run()
