@@ -21,7 +21,8 @@ class Mapper:
         sensor_readings = []
 
         for angle in range(-range_deg, range_deg, deg_interval):
-            self.car.set_dir_servo_angle(angle)
+            #self.car.set_dir_servo_angle(angle)
+            self.car.set_cam_pan_angle(angle)
             time.sleep(0.1)
 
             # take 3 readings and average them for accuracy
@@ -110,7 +111,10 @@ class Mapper:
     
     def visualize_grid(self):
         # visualize the grid
-        for row in self.grid:
+        # transpose and reverse rows for -90 degree rotation
+        rotated_grid = np.rot90(self.grid, k=1)  # k=1 for -90 degrees
+        
+        for row in rotated_grid:
             line = ""
             for cell in row:
                 if cell == 1:
