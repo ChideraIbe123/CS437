@@ -32,7 +32,7 @@ def run():
 	car.set_cam_tilt_angle(30)
 	k = 12
 	start = (50,50)
-	end = (50,150)
+	end = (50,180)
 	path = run_astar(car,start,end)
 	car.set_cam_pan_angle(0)
 	turn_count = 0
@@ -46,23 +46,25 @@ def run():
 			car.set_dir_servo_angle(0)
 			car.forward(30)
 			t = 0
-			if dir[1] > 4 and dir[2] == "North":
-				t = (dir[1] - 3) / 24.0 # stop before the obstacle
+			if  dir[2] == "North":
+				t = (dir[1] * 0.7) / 24.0 # stop before the obstacle
 			else: #  go to the side longer just to be safe
 				t = (dir[1] + 20) / 24.0
 			num = int(t / 0.2)
 			for i in range(num):
-				if face_detected():
-					time.sleep(10)
-					print("Face detected")
-				time.sleep(t)
+				time.sleep(t / num)
+				car.forward(30)
+				# if face_detected():
+				# 	car.forward(0)
+				# 	time.sleep(10)
+				# 	print("Face detected")
 			car.forward(0)
 			if dir[2] == "North":
-				end = (end[0] ,end[1] - dir[1])
+				end = (end[0] ,end[1] - int(dir[1]/2))
 			elif dir[2] == "East":
-				end = (end[0] - dir[1] , end[1])
+				end = (end[0] - int(dir[1]/2) , end[1])
 			elif dir[2] == "West":
-				end = (end[0] + dir[1],end[1])
+				end = (end[0] + int(dir[1]/2),end[1])
 				
 		elif dir[0] == 'R':
 			print("Current direction: ", dir[0], "  number: ", dir[1])
@@ -79,12 +81,16 @@ def run():
 		if turn_count%2 == 0 and turn_count != 0:
 			car.set_dir_servo_angle(0)
 			car.forward(30)
-			time.sleep(1.5)
+			time.sleep(2)
 			car.forward(0)
 			path = run_astar(car,start,end)
+			car.set_cam_pan_angle(0)
 			turn_count = 0
+			end = (end[0] , end[1] - 10)
 		time.sleep(1.0)
 	print("Goal location reached")
+	car.forward(0)
+	car.set_dir_servo_angle(0)
 	
 def turn_right(car):
 	car.set_dir_servo_angle(-30)
