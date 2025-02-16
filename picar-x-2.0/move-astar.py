@@ -28,6 +28,7 @@ def face_detected():
 
 def run():
 	car = Picarx()
+	init_vision()
 	car.set_cam_tilt_angle(30)
 	k = 12
 	start = (50,50)
@@ -49,7 +50,12 @@ def run():
 				t = (dir[1] - 3) / 24.0 # stop before the obstacle
 			else: #  go to the side longer just to be safe
 				t = (dir[1] + 20) / 24.0
-			time.sleep(t)
+			num = int(t / 0.2)
+			for i in range(num):
+				if face_detected():
+					time.sleep(10)
+					print("Face detected")
+				time.sleep(t)
 			car.forward(0)
 			if dir[2] == "North":
 				end = (end[0] ,end[1] - dir[1])
