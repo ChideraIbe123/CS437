@@ -14,9 +14,11 @@ def a_star(grid, start, goal):
         _, current = heapq.heappop(open_set)
         if current == goal:
             path = []
+            print("solution path:")
             while current in came_from:
                 path.append(current)
                 current = came_from[current]
+                print(current[0], ", " ,current[1])
             return path[::-1]
         
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -27,6 +29,8 @@ def a_star(grid, start, goal):
                     cost[neighbor] = new_cost
                     heapq.heappush(open_set, (new_cost + heuristic(neighbor, goal), neighbor))
                     came_from[neighbor] = current
+
+
     return None
     
 def run_astar(car, start=(50,50), end=(100,100)):
@@ -42,7 +46,50 @@ def run_astar(car, start=(50,50), end=(100,100)):
         print("Exiting...")
         mapper.car.reset()
     other = a_star(mapper.get_grid(), start, end)
-    return other
+    directions = []
+    dir = '0'
+    curr_x = 50
+    curr_y = 0
+    head = "North"
+    for cord in other:
+        dx = cord[0] - curr_x
+        dy = cord[1] - curr_y
+        curr_x = cord[0]
+        curr_y = cord[1]
+        if(dx > 0):
+            if head == "North":
+                head = "East"
+                new_dir = 'R'
+            elif head == "West":
+                head = "North"
+                new_dir = 'R'
+            else:
+                new_dir = 'F'
+        elif(dx < 0):
+            if head == "North":
+                head = "West"
+                new_dir = 'L'
+            elif head == "East":
+                head = "North"
+                new_dir = 'L'
+            else:
+                new_dir = 'F'
+        else:
+            new_dir = 'F'
+        directions.append(new_dir)
+    simple_directions = [['0'],[0]]
+    for dir in directions:
+        if dir == 'F':
+            if simple_directions[-1][0] == 'F':
+                simple_directions[-1][1] += 1
+            else:
+                simple_directions.append(['F', 1])
+        if dir == 'L':
+            simple_directions.append(['L',1])
+        else:
+            simple_directions.append(['R',1])
+            
+    return simple_directions
 if __name__ == "__main__":
         start, end = (50, 50), (50,51) 
         mapper = Mapper()
