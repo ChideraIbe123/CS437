@@ -48,8 +48,8 @@ def run_astar(car, start=(50,50), end=(100,100)):
     other = a_star(mapper.get_grid(), start, end)
     directions = []
     dir = '0'
-    curr_x = 50
-    curr_y = 0
+    curr_x = start[0]
+    curr_y = start[1]
     head = "North"
     for cord in other:
         dx = cord[0] - curr_x
@@ -75,19 +75,26 @@ def run_astar(car, start=(50,50), end=(100,100)):
             else:
                 new_dir = 'F'
         else:
-            new_dir = 'F'
-        directions.append(new_dir)
-    simple_directions = [['0'],[0]]
-    for dir in directions:
+            if head == "East":
+                head = "North"
+                new_dir = 'L'
+            elif head == "West":
+                head = "North"
+                new_dir = 'R'
+            else:
+                new_dir = 'F'
+        directions.append([new_dir,head])
+    simple_directions = [['0',0,'Null']]
+    for dir,pose in directions:
         if dir == 'F':
             if simple_directions[-1][0] == 'F':
                 simple_directions[-1][1] += 1
             else:
-                simple_directions.append(['F', 1])
-        if dir == 'L':
-            simple_directions.append(['L',1])
-        else:
-            simple_directions.append(['R',1])
+                simple_directions.append(['F', 1,pose])
+        elif dir == 'L':
+            simple_directions.append(['L',1,'Null'])
+        elif dir == 'R':
+            simple_directions.append(['R',1,'Null'])
             
     return simple_directions
 if __name__ == "__main__":

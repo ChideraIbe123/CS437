@@ -4,7 +4,7 @@ import numpy as np
 import math
 
 class Mapper:
-    def __init__(self, car, map_size = 200, cell_size = 3):
+    def __init__(self, car, map_size = 100, cell_size = 1):
         self.car = car
         self.map_size = map_size
         self.cell_size = cell_size
@@ -34,33 +34,8 @@ class Mapper:
 
         return sensor_readings
     
-    def update_grid(self, sensor_readings):
+    0
 
-        obstacle_points = []
-        for angle, distance in sensor_readings:
-            obstacle_x = int(distance * math.cos(math.radians(angle)))
-            obstacle_y = int(distance * math.sin(math.radians(angle)))
-
-            grid_x = self.x + obstacle_x
-            grid_y = self.y + obstacle_y
-
-            if 0 <= grid_x < self.map_size and 0 <= grid_y < self.map_size:
-                obstacle_points.append((grid_x, grid_y))
-                self.grid[grid_y, grid_x] = 1 
-        
-        for i in range(len(obstacle_points) - 1):
-            x0, y0 = obstacle_points[i]
-            x1, y1 = obstacle_points[i + 1]
-
-            avg_distance = (sensor_readings[i][1] + sensor_readings[i + 1][1]) / 2
-            max_gap = 2 * avg_distance * math.sin(math.radians(2.5)) 
-
-            distance = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
-            if distance <= max_gap:
-                points = self.bresenham_line(x0, y0, x1, y1)
-                for x, y in points: 
-                    if 0 <= x < self.map_size and 0 <= y < self.map_size:
-                        self.grid[y, x] = 1
                     
     def update_position(self, dx, dy):
         self.x += dx
