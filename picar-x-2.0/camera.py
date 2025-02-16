@@ -1,41 +1,45 @@
+from picarx import Picarx
 from vilib import Vilib
-from ultralytics import YOLO
-import cv2
 import time
 
-def main():
+SPEED = 20
+
+def init_vision():
+
     Vilib.camera_start(vflip=False, hflip=False)
     Vilib.display(local=True, web=True)
-    print("Vilib camera started. Display enabled.")
+    Vilib.face_detect_switch(True)
+    print("Camera and face detection started.")
 
-    model = YOLO("yolov8n.pt")
-    print("YOLO model loaded.")
+def face_detected():
+    
+    if Vilib.detect_obj_parameter.get('human_n', 0) > 0:
+        human_x = Vilib.detect_obj_parameter.get('human_x', 0)
+        human_y = Vilib.detect_obj_parameter.get('human_y', 0)
+        human_w = Vilib.detect_obj_parameter.get('human_w', 0)
+        human_h = Vilib.detect_obj_parameter.get('human_h', 0)
+        print(f"Face detected! Coordinate: ({human_x}, {human_y}) Size: ({human_w}, {human_h})")
+        return True
+    return False
 
-    while True:
-       
-        frame = Vilib.get_frame()  
-        if frame is None:
-            time.sleep(0.1)
-            continue
+def main():
+    car = Picarx()
+    init_vision()
+    time.sleep(10)
 
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        results = model(frame_rgb)
-        annotated_frame = results[0].plot() 
-
-        for result in results:
-            for box in result.boxes:
-                detected_class = box.cls[0]
-                confidence = box.conf[0]
-                print(f"Detected class: {detected_class} with confidence: {confidence:.2f}")
-
-        cv2.imshow("Vilib + YOLO Object Detection", annotated_frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    Vilib.camera_close()
-    cv2.destroyAllWindows()
+    try:
+        print("Car is moving forward. Waiting for face detection...")
+        while True:
+            if face_detected():
+                print("Face detected. Stopping car.")
+                car.forward(0)  
+                break
+            else:
+                car.forward(SPEED)
+            time.sleep(0.1)  
+    finally:
+        car.forward(0)  
+        print("Car motion halted.")
 
 if __name__ == "__main__":
     main()
