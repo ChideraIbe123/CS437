@@ -13,7 +13,7 @@ class Mapper:
 
         # starting position
         self.x = self.map_size // 2
-        self.y = self.map_size // 2
+        self.y = 0
 
     def scan(self, range_deg = 60, deg_interval = 5):
         # scan the environment using the ultrasonic sensor
@@ -29,7 +29,7 @@ class Mapper:
             angle_readings = []
             for _ in range(3):
                 distance = self.car.ultrasonic.read()
-                if distance is not None and distance < 200: # only consider valid readings/close obstacles
+                if distance is not None and distance < 100: # only consider valid readings within our grid size
                     angle_readings.append(distance)
                 time.sleep(0.05)
 
