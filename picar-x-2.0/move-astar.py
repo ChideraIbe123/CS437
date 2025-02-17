@@ -1,7 +1,7 @@
 from picarx import Picarx
 import time
 import mapper 
-from a_star2 import run_astar
+from a_star import run_astar
 from vilib import Vilib
 
 from gpiozero import Device
@@ -9,7 +9,6 @@ from gpiozero.pins.native import NativeFactory
 Device.pin_factory = NativeFactory()
 
 def init_vision():
-
     Vilib.camera_start(vflip=False, hflip=False)
     Vilib.display(local=True, web=True)
     Vilib.face_detect_switch(True)
@@ -32,7 +31,7 @@ def run():
 	car.set_cam_tilt_angle(30)
 	k = 12
 	start = (50,50)
-	end = (50,180)
+	end = (180,180) # edit based on goal
 	path = run_astar(car,start,end)
 	car.set_cam_pan_angle(0)
 	turn_count = 0
@@ -51,14 +50,25 @@ def run():
 			else: #  go to the side longer just to be safe
 				t = (dir[1] + 20) / 24.0
 			num = int(t / 0.2)
+			#split up the forward movement into 0.2s intervals so we can check for faces in between the intervals
 			for i in range(num):
 				time.sleep(t / num)
 				car.forward(30)
-				# if face_detected():
-				# 	car.forward(0)
-				# 	time.sleep(10)
-				# 	print("Face detected")
+				if face_detected():
+					car.forward(0)
+					time.sleep(10)
+					print("Face detected")
+				# going in the same direction for a while, check for obstacles again to be safe
+				if t > 7.0:
+					if i > num:
+						car.forward(0)
+						path = run_astar(car,start,end)
+						car.set_cam_pan_angle(0)
+						end = (end[0] ,end[1] - int(dir[1]/4))
+						break
+
 			car.forward(0)
+			# update end location based on movement
 			if dir[2] == "North":
 				end = (end[0] ,end[1] - int(dir[1]/2))
 			elif dir[2] == "East":
@@ -70,13 +80,13 @@ def run():
 			print("Current direction: ", dir[0], "  number: ", dir[1])
 			turn_right(car)
 			car.forward(30)
-			time.sleep(0.2)
+			time.sleep(0.3)
 			turn_count += 1
 		else:
 			print("Current direction: ", dir[0], "  number: ", dir[1])
 			turn_left(car)
 			car.forward(30)
-			time.sleep(0.2)
+			time.sleep(0.3)
 			turn_count+= 1
 		if turn_count%2 == 0 and turn_count != 0:
 			car.set_dir_servo_angle(0)
@@ -115,8 +125,10 @@ def turn_right(car):
 	car.backward(0)
 	car.set_dir_servo_angle(30)
 	car.forward(30)
-	time.sleep(0.3)
+	time.sleep(0.2)
 	car.set_dir_servo_angle(0)
+	car.forward(0)
+	time.sleep(0.2)
 	car.backward(30)
 	time.sleep(0.3)
 	car.backward(0)
@@ -147,7 +159,7 @@ def turn_left(car):
 	time.sleep(0.3)
 	car.set_dir_servo_angle(0)
 	car.forward(0)
-	time.sleep(0.3)
+	time.sleep(0.2)
 	car.backward(30)
 	time.sleep(0.3)
 	car.backward(0)
